@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Daily High Score Challenge video for Gravity! The Word Game.
 
-Usage: python3 make_video.py RECORDING.mp4 "24 NOV 2026" caps.json OUT.mp4 [WORKDIR]
+Usage: python3 make_video.py RECORDING.mp4 "24 NOV 2026" caps.json OUT.mp4 [WORKDIR] [--music FILE] [--sfx]
+
+--music FILE: replace the soundtrack with FILE (looped, faded), e.g. assets/gravity-arcade.m4a, our own
+  composition (tools/compose_music.py). Without --sfx the recording's audio is dropped entirely (use this when
+  the recording has the game's music in it: the Pixabay/Tunetank track gets YouTube Content ID claims).
+--sfx: with --music, keep the recording's audio too (for recordings made with the game's music OFF, so only
+  the sound effects remain), mixed over the new music.
 
 caps.json: [{"s": 3.0, "e": 7.6, "text": "Line one|Line *gold* two"}, ...]
   s/e are seconds in the RECORDING's timeline (the opening card covers 0-3 s).
@@ -84,8 +90,12 @@ def captions(caps, wd):
         im.save(f'{wd}/cap_{i:02d}.png')
 
 def main():
-    rec, date, capsf, out = sys.argv[1:5]
-    wd = sys.argv[5] if len(sys.argv) > 5 else os.path.dirname(os.path.abspath(out))
+    args = sys.argv[1:]; music = None; sfx = '--sfx' in args
+    if '--sfx' in args: args.remove('--sfx')
+    if '--music' in args:
+        i = args.index('--music'); music = args[i + 1]; del args[i:i + 2]
+    rec, date, capsf, out = args[:4]
+    wd = args[4] if len(args) > 4 else os.path.dirname(os.path.abspath(out))
     os.makedirs(wd, exist_ok=True)
     caps = json.load(open(capsf)); D = dur(rec)
     hold, endc = 4.0, 4.0
@@ -93,7 +103,7 @@ def main():
     cards(date, wd); captions(caps, wd)
     inp = ['-loop', '1', '-framerate', '30', '-i', f'{wd}/bg.png', '-i', rec,
            '-loop', '1', '-framerate', '30', '-i', f'{wd}/open.png', '-loop', '1', '-framerate', '30', '-i', f'{wd}/close.png',
-           '-i', A('music-tail.m4a')]
+           ] + (['-stream_loop', '-1', '-i', music] if music else ['-i', A('music-tail.m4a')])
     for i in range(len(caps)):
         inp += ['-loop', '1', '-framerate', '30', '-t', str(T + 1), '-i', f'{wd}/cap_{i:02d}.png']
     f = [f"[1:v]fps=30,crop=1080:2245:0:100,scale=712:1480:flags=lanczos,setsar=1,tpad=stop_mode=clone:stop_duration={hold + endc + 1}[g]",
@@ -107,9 +117,13 @@ def main():
           f"[{prev}][o]overlay=0:0:eof_action=pass[bo]",
           f"[3:v]format=rgba,fade=t=in:st=0:d=0.6:alpha=1,trim=0:{endc + 0.1},setpts=PTS+{close_at}/TB[cl]",
           f"[bo][cl]overlay=0:0:eof_action=pass,trim=0:{T},format=yuv420p[v]",
+          ] + (([f"[4:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{T},asetpts=PTS-STARTPTS,volume={0.55 if sfx else 1.0},afade=t=in:d=0.5,afade=t=out:st={T - 2.5}:d=2.5[m]"]
+                + ([f"[1:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=in:d=0.3,afade=t=out:st={tail_at}:d=1.2[s]",
+                    f"[s][m]amix=inputs=2:duration=longest:normalize=0,atrim=0:{T}[a]"] if sfx else ["[m]anull[a]"]))
+               if music else [
           f"[1:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=in:d=0.3,afade=t=out:st={tail_at}:d=1.2[a1]",
           f"[4:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{T - tail_at},asetpts=PTS-STARTPTS,afade=t=in:d=1.0,afade=t=out:st={max(0.5, T - tail_at - 2.0)}:d=2.0,adelay={int(tail_at * 1000)}|{int(tail_at * 1000)}[a2]",
-          f"[a1][a2]amix=inputs=2:duration=longest:normalize=0,atrim=0:{T}[a]"]
+          f"[a1][a2]amix=inputs=2:duration=longest:normalize=0,atrim=0:{T}[a]"])
     subprocess.run(['ffmpeg', '-v', 'error', '-y'] + inp + ['-filter_complex', ';'.join(f), '-map', '[v]', '-map', '[a]',
                     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-c:a', 'aac', '-b:a', '160k',
                     '-movflags', '+faststart', out], check=True)
