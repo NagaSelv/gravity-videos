@@ -1,0 +1,59 @@
+name: Post queued videos
+
+on:
+  push:
+    branches: [main]
+    paths: ["posts/**"]
+  schedule:
+    - cron: "23 * * * *" # hourly: retries anything that failed
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Check posts without uploading"
+        type: boolean
+        default: false
+
+concurrency:
+  group: poster
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            posts
+            poster
+          sparse-checkout-cone-mode: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Upload due posts
+        env:
+          POSTER_URL: https://tired-linguist-poster.netlify.app
+          POSTER_API_KEY: ${{ secrets.POSTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: node poster/post.mjs
+
+      - name: Save results back to the post files
+        if: always()
+        run: |
+          [ -s .poster-changed ] || { echo "Nothing to save."; exit 0; }
+          git config user.name "poster-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $(cat .poster-changed)
+          git commit -m "poster: save results" || exit 0
+          for i in 1 2 3; do
+            git pull --rebase --quiet origin main && git push && exit 0
+            sleep 5
+          done
+          exit 1

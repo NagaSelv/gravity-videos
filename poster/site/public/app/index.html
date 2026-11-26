@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Poster · Tired Linguist</title>
+<style>
+  :root{--bg:#f6f5f1;--card:#fff;--ink:#1f2328;--muted:#6a6f76;--line:#e4e2dc;--accent:#2b5fd9;--ok:#1f8a4c;--warn:#b26b00;--bad:#c0392b}
+  @media (prefers-color-scheme:dark){:root{--bg:#16181b;--card:#1f2226;--ink:#e8e6e1;--muted:#9aa0a6;--line:#30343a;--accent:#7fa6ff;--ok:#5cc489;--warn:#e0a54a;--bad:#ef7b6f}}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  main{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  h1{font-size:1.35rem;margin:0}
+  h2{font-size:1rem;margin:0 0 12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+  .primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .link{border:none;background:none;color:var(--muted);padding:4px 6px}
+  input{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+  .row{display:flex;gap:12px;align-items:center}
+  .row>*:first-child{flex:1;min-width:0}
+  .muted{color:var(--muted);font-size:.92rem}
+  .ch{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .ch:first-of-type{border-top:none}
+  .ch img{width:40px;height:40px;border-radius:50%}
+  .ch .info{flex:1;min-width:0}
+  .ch .id{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--muted);word-break:break-all}
+  .pill{font-size:.78rem;padding:2px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+  .ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+  .post{padding:10px 0;border-top:1px solid var(--line)}
+  .post:first-of-type{border-top:none}
+  .post .t{font-weight:600}
+  .notice{border-left:3px solid var(--warn);padding:8px 12px;background:color-mix(in srgb,var(--warn) 8%,transparent);border-radius:6px;margin-bottom:16px;font-size:.92rem}
+  .flash{border-left:3px solid var(--accent);padding:8px 12px;border-radius:6px;margin-bottom:16px;background:color-mix(in srgb,var(--accent) 8%,transparent)}
+  .hidden{display:none}
+  code{font-family:ui-monospace,monospace;font-size:.88em}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Tired Linguist Poster</h1>
+    <button id="logout" class="link hidden">Log out</button>
+  </header>
+
+  <div id="flash" class="flash hidden"></div>
+
+  <section id="login" class="card hidden">
+    <h2>Sign in</h2>
+    <form id="loginForm" class="row">
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password" required>
+      <button class="primary">Sign in</button>
+    </form>
+    <p id="loginErr" class="bad hidden">Wrong password.</p>
+  </section>
+
+  <div id="setup" class="notice hidden"></div>
+
+  <section id="dash" class="hidden">
+    <div class="notice">
+      Until YouTube's API audit is approved, YouTube locks videos uploaded by this app as <b>private</b>.
+      Post through Buffer in the meantime.
+    </div>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:8px">
+        <h2 style="margin:0">YouTube channels</h2>
+        <a class="btn primary" href="/auth/youtube/start">+ Connect a channel</a>
+      </div>
+      <p class="muted" style="margin-top:0">If one Google account has several channels, Google asks which one. Connect each channel separately.</p>
+      <div id="channels"><p class="muted">Loading…</p></div>
+    </div>
+
+    <div class="card">
+      <h2>Recent posts</h2>
+      <div id="posts"><p class="muted">Loading…</p></div>
+      <p class="muted" style="margin-bottom:0">Posts are files in <a href="https://github.com/NagaSelv/gravity-videos/tree/main/posts" target="_blank">gravity-videos/posts</a>.
+        Runs and errors: <a href="https://github.com/NagaSelv/gravity-videos/actions/workflows/post.yml" target="_blank">GitHub Actions</a>.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const show = (el, on = true) => el.classList.toggle("hidden", !on);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = (iso) => iso ? new Date(iso).toLocaleString(undefined, {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { credentials: "same-origin", headers: { "content-type": "application/json" }, ...opts });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(data.message || data.error || res.status), { status: res.status });
+  return data;
+}
+
+function flashFromUrl() {
+  const p = new URLSearchParams(location.search).get("yt");
+  if (!p) return;
+  const msgs = {
+    login_first: "Sign in first, then connect the channel.",
+    bad_state: "That sign-in link expired. Try connecting again.",
+    no_refresh_token: "Google didn't give long-term access. Remove the app at myaccount.google.com/permissions and connect again.",
+    no_channel_on_account: "That Google account has no YouTube channel.",
+    google_access_denied: "Connection cancelled.",
+  };
+  let text = msgs[p] || (p.startsWith("connected:") ? `Connected ${p.slice(10)}.` : `Something went wrong: ${p.replace(/^error:/, "")}`);
+  $("flash").textContent = text;
+  show($("flash"));
+  history.replaceState(null, "", "/app/");
+}
+
+async function loadChannels() {
+  const { channels } = await api("/api/channels");
+  if (!channels.length) {
+    $("channels").innerHTML = '<p class="muted">No channels connected yet.</p>';
+    return;
+  }
+  $("channels").innerHTML = channels.map((c) => `
+    <div class="ch">
+      ${c.thumbnail ? `<img src="${esc(c.thumbnail)}" alt="">` : ""}
+      <div class="info">
+        <div><b>${esc(c.title)}</b> ${c.handle ? `<span class="muted">${esc(c.handle)}</span>` : ""}</div>
+        <div class="id">${esc(c.id)}</div>
+      </div>
+      ${c.needsReconnect ? `<a class="pill bad" href="/auth/youtube/start">Reconnect</a>` : `<span class="pill ok">Connected</span>`}
+      <button class="link" data-remove="${esc(c.id)}" data-title="${esc(c.title)}">Remove</button>
+    </div>`).join("");
+}
+
+$("channels").addEventListener("click", async (e) => {
+  const id = e.target.dataset.remove;
+  if (!id || !confirm(`Disconnect ${e.target.dataset.title}? Queued posts for it will fail until you reconnect.`)) return;
+  await api(`/api/channels?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  loadChannels();
+});
+
+async function loadPosts() {
+  try {
+    const list = await fetch("https://api.github.com/repos/NagaSelv/gravity-videos/contents/posts?ref=main").then((r) => r.json());
+    const files = (Array.isArray(list) ? list : []).filter((f) => f.name.endsWith(".json")).sort((a, b) => b.name.localeCompare(a.name)).slice(0, 10);
+    if (!files.length) { $("posts").innerHTML = '<p class="muted">No posts yet.</p>'; return; }
+    const posts = await Promise.all(files.map((f) => fetch(f.download_url, { cache: "no-store" }).then((r) => r.json()).then((p) => ({ name: f.name, ...p })).catch(() => null)));
+    $("posts").innerHTML = posts.filter(Boolean).map((p) => {
+      const targets = [].concat(p.youtube || []);
+      const rows = targets.map((t) => {
+        const r = (p.results || {})[`youtube:${t.channel}`];
+        const st = r?.status || "queued";
+        const cls = { scheduled: "ok", published: "ok", uploaded: "ok", failed: "bad", skipped: "warn" }[st] || "warn";
+        const extra = r?.url ? ` · <a href="${esc(r.url)}" target="_blank">video</a>` : r?.error ? ` · ${esc(r.error)}` : "";
+        return `<div class="muted"><span class="pill ${cls}">${esc(st)}</span> ${esc(t.title)} → ${esc(r?.channel || t.channel)}${extra}</div>`;
+      }).join("");
+      return `<div class="post"><div class="t">${esc(p.name.replace(/\.json$/, ""))}</div>
+        <div class="muted">${p.publishAt ? `Goes public ${esc(fmt(p.publishAt))}` : "Publish immediately"}</div>${rows}</div>`;
+    }).join("");
+  } catch {
+    $("posts").innerHTML = '<p class="muted">Couldn\'t load posts from GitHub.</p>';
+  }
+}
+
+async function init() {
+  flashFromUrl();
+  const me = await api("/api/me");
+  if (me.missingConfig?.length) {
+    $("setup").innerHTML = `Setup isn't finished. Missing in Netlify environment variables: <code>${me.missingConfig.map(esc).join("</code>, <code>")}</code>`;
+    show($("setup"));
+  }
+  show($("login"), !me.loggedIn);
+  show($("dash"), me.loggedIn);
+  show($("logout"), me.loggedIn);
+  if (me.loggedIn) { loadChannels(); loadPosts(); }
+}
+
+$("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  show($("loginErr"), false);
+  try {
+    await api("/api/login", { method: "POST", body: JSON.stringify({ password: $("pw").value }) });
+    $("pw").value = "";
+    init();
+  } catch { show($("loginErr")); }
+});
+
+$("logout").addEventListener("click", async () => { await api("/api/logout", { method: "POST" }); init(); });
+
+init();
+</script>
+</body>
+</html>
