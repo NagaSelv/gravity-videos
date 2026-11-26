@@ -1,0 +1,11 @@
+{
+  "video": "tired-linguist/day01_gravity.mp4",
+  "youtube": {
+    "channel": "@thetiredlinguist",
+    "title": "Poster test 3 (unlisted, delete me)",
+    "description": "Test upload from Tired Linguist Poster, checking whether non-private uploads are locked.",
+    "categoryId": "20",
+    "madeForKids": false,
+    "privacy": "unlisted"
+  }
+}
