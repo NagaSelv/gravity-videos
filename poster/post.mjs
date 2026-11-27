@@ -12,7 +12,7 @@ const MAX_ATTEMPTS = 3;
 const STALE_DAYS = 3; // never post something that was due more than this long ago
 const SCHEDULE_MARGIN_MS = 10 * 60 * 1000; // closer than this to now => publish immediately
 const IG_EARLY_MS = 3 * 60 * 1000; // Instagram has no scheduling: publish once due (minus this)
-const IG_API = "https://graph.instagram.com/v25.0";
+const IG_API = "https://graph.facebook.com/v25.0"; // Instagram API with Unified Login
 const UPLOAD_CAP = /exceeded the number of videos/i; // YouTube per-channel daily cap: wait, don't count
 const WAIT_RETRY_MS = 2 * 60 * 60 * 1000; // retry capped channels every 2 hours
 

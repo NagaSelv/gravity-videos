@@ -76,7 +76,7 @@
         <h2 style="margin:0">Instagram accounts</h2>
         <a class="btn primary" href="/auth/instagram/start">+ Connect an account</a>
       </div>
-      <p class="muted" style="margin-top:0">Professional accounts only. Instagram asks you to log in; log in as the account you want to connect (log out of Instagram in this browser first to switch).</p>
+      <p class="muted" style="margin-top:0">Signs in through Facebook: pick the Tired Linguist portfolio and tick the Instagram accounts to share. You can connect several at once. Access never expires.</p>
       <div id="igAccounts"><p class="muted">Loading…</p></div>
     </div>
 
@@ -112,7 +112,7 @@ function flashFromUrl() {
     no_refresh_token: "Google didn't give long-term access. Remove the app at myaccount.google.com/permissions and connect again.",
     no_channel_on_account: "That Google account has no YouTube channel.",
     google_access_denied: "Connection cancelled.",
-    not_configured: "Instagram isn't set up yet: add INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET in Netlify.",
+    not_configured: "Instagram isn't set up yet: META_APP_SECRET is missing in Netlify.",
   };
   let text = msgs[p] || (p.startsWith("connected:") ? `Connected ${p.slice(10)}.` : `Something went wrong: ${p.replace(/^error:/, "")}`);
   $("flash").textContent = text;
@@ -149,12 +149,12 @@ async function loadIgAccounts() {
   const { accounts } = await api("/api/instagram/accounts");
   if (!accounts.length) { $("igAccounts").innerHTML = '<p class="muted">No accounts connected yet.</p>'; return; }
   $("igAccounts").innerHTML = accounts.map((a) => {
-    const days = Math.round((a.tokenExpiresAt - Date.now()) / 864e5);
-    const pill = a.needsReconnect || days < 0 ? `<a class="pill bad" href="/auth/instagram/start">Reconnect</a>` : `<span class="pill ok">Connected</span>`;
+    const expired = a.tokenExpiresAt && a.tokenExpiresAt < Date.now();
+    const pill = a.needsReconnect || expired ? `<a class="pill bad" href="/auth/instagram/start">Reconnect</a>` : `<span class="pill ok">Connected</span>`;
     return `<div class="ch">
       ${a.picture ? `<img src="${esc(a.picture)}" alt="">` : ""}
-      <div class="info"><div><b>${esc(a.handle)}</b> <span class="muted">${esc((a.accountType || "").toLowerCase())}</span></div>
-        <div class="id">${esc(a.id)} · sign-in renews automatically</div></div>
+      <div class="info"><div><b>${esc(a.handle)}</b> </div>
+        <div class="id">${esc(a.id)}</div></div>
       ${pill}
       <button class="link" data-igremove="${esc(a.id)}" data-title="${esc(a.handle)}">Remove</button>
     </div>`;

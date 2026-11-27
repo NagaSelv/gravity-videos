@@ -1,8 +1,8 @@
+// Instagram API with Unified Login (Facebook Login for Business + configuration).
+// The login returns a Business Integration System User token that never expires.
 import { getStore } from "@netlify/blobs";
 
-export const IG_API = "https://graph.instagram.com/v25.0";
-export const IG_SCOPES = ["instagram_business_basic", "instagram_business_content_publish"];
-const REFRESH_AFTER_MS = 7 * 24 * 60 * 60 * 1000; // long-lived tokens last 60 days; refresh weekly
+export const FB_GRAPH = "https://graph.facebook.com/v25.0";
 
 export const igStore = () => getStore({ name: "ig-accounts", consistency: "strong" });
 
@@ -10,70 +10,89 @@ export function igRedirectUri(req) {
   return `${process.env.URL || new URL(req.url).origin}/auth/instagram/callback`;
 }
 
-async function igJson(res, what) {
+export function igConfigured() {
+  return Boolean(process.env.META_APP_ID && process.env.META_APP_SECRET && process.env.INSTAGRAM_CONFIG_ID);
+}
+
+async function fbJson(res, what) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok || data.error) {
-    const msg = data.error?.message || data.error_message || data.error_description || `${what} failed (${res.status})`;
-    const err = new Error(msg);
-    err.code = data.error?.code || data.error_type || data.error;
+    const err = new Error(data.error?.message || `${what} failed (${res.status})`);
+    err.code = data.error?.code;
     throw err;
   }
   return data;
 }
 
-/** code → short-lived token → long-lived (60-day) token + profile */
-export async function connectInstagram(code, req) {
-  const short = await igJson(
-    await fetch("https://api.instagram.com/oauth/access_token", {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: process.env.INSTAGRAM_APP_ID,
-        client_secret: process.env.INSTAGRAM_APP_SECRET,
-        grant_type: "authorization_code",
-        redirect_uri: igRedirectUri(req),
-        code,
-      }),
-    }),
-    "Code exchange"
-  );
-  const shortToken = short.access_token || short.data?.[0]?.access_token;
-  const long = await igJson(
-    await fetch(
-      `https://graph.instagram.com/access_token?${new URLSearchParams({
-        grant_type: "ig_exchange_token",
-        client_secret: process.env.INSTAGRAM_APP_SECRET,
-        access_token: shortToken,
-      })}`
-    ),
-    "Long-lived token exchange"
-  );
-  const me = await igJson(
-    await fetch(
-      `${IG_API}/me?${new URLSearchParams({
-        fields: "user_id,username,profile_picture_url,account_type",
-        access_token: long.access_token,
-      })}`
-    ),
-    "Profile lookup"
-  );
-  const account = {
-    id: String(me.user_id || me.id),
-    username: me.username,
-    handle: `@${me.username}`,
-    accountType: me.account_type || null,
-    picture: me.profile_picture_url || null,
-    accessToken: long.access_token,
-    tokenIssuedAt: Date.now(),
-    tokenExpiresAt: Date.now() + (long.expires_in || 5184000) * 1000,
-    connectedAt: new Date().toISOString(),
-    needsReconnect: false,
-  };
-  await igStore().setJSON(account.id, account);
-  return account;
+export function loginUrl(req, state) {
+  const params = new URLSearchParams({
+    client_id: process.env.META_APP_ID,
+    config_id: process.env.INSTAGRAM_CONFIG_ID,
+    redirect_uri: igRedirectUri(req),
+    response_type: "code",
+    override_default_response_type: "true",
+    state,
+  });
+  return `https://www.facebook.com/v25.0/dialog/oauth?${params}`;
 }
 
-/** Returns a valid token for an account, refreshing it when it is over a week old. */
+/** code → system-user token → the Instagram accounts it was granted. Stores one record per account. */
+export async function connectInstagram(code, req) {
+  const tok = await fbJson(
+    await fetch(
+      `${FB_GRAPH}/oauth/access_token?${new URLSearchParams({
+        client_id: process.env.META_APP_ID,
+        client_secret: process.env.META_APP_SECRET,
+        redirect_uri: igRedirectUri(req),
+        code,
+      })}`
+    ),
+    "Code exchange"
+  );
+  const token = tok.access_token;
+
+  // Which Instagram accounts did the login grant? debug_token lists them per permission.
+  const dbg = await fbJson(
+    await fetch(
+      `${FB_GRAPH}/debug_token?${new URLSearchParams({
+        input_token: token,
+        access_token: `${process.env.META_APP_ID}|${process.env.META_APP_SECRET}`,
+      })}`
+    ),
+    "Token check"
+  );
+  const scopes = dbg.data?.granular_scopes || [];
+  const ids = new Set(
+    scopes.filter((s) => /^instagram_(content_publish|basic)$/.test(s.scope)).flatMap((s) => s.target_ids || [])
+  );
+  if (!ids.size) throw new Error("No Instagram account was shared. Connect again and tick your Instagram account(s).");
+
+  const store = igStore();
+  const saved = [];
+  for (const id of ids) {
+    const me = await fbJson(
+      await fetch(`${FB_GRAPH}/${id}?${new URLSearchParams({ fields: "username,profile_picture_url", access_token: token })}`),
+      "Account lookup"
+    ).catch(() => null);
+    if (!me?.username) continue; // not an Instagram account
+    const account = {
+      id: String(id),
+      username: me.username,
+      handle: `@${me.username}`,
+      picture: me.profile_picture_url || null,
+      accessToken: token,
+      tokenType: "system-user",
+      tokenExpiresAt: dbg.data?.expires_at ? dbg.data.expires_at * 1000 : null, // null = never
+      connectedAt: new Date().toISOString(),
+      needsReconnect: false,
+    };
+    await store.setJSON(account.id, account);
+    saved.push(account);
+  }
+  if (!saved.length) throw new Error("Couldn't read the shared Instagram account(s).");
+  return saved;
+}
+
 export async function igTokenFor(accountId) {
   const store = igStore();
   const acc = await store.get(accountId, { type: "json" });
@@ -82,33 +101,9 @@ export async function igTokenFor(accountId) {
     err.code = "unknown_account";
     throw err;
   }
-  if (Date.now() > acc.tokenExpiresAt) {
+  if (acc.tokenExpiresAt && Date.now() > acc.tokenExpiresAt) {
     await store.setJSON(accountId, { ...acc, needsReconnect: true });
-    throw Object.assign(new Error("Instagram sign-in expired. Reconnect the account."), { code: "expired" });
-  }
-  if (Date.now() - acc.tokenIssuedAt > REFRESH_AFTER_MS) {
-    try {
-      const r = await igJson(
-        await fetch(
-          `https://graph.instagram.com/refresh_access_token?${new URLSearchParams({
-            grant_type: "ig_refresh_token",
-            access_token: acc.accessToken,
-          })}`
-        ),
-        "Token refresh"
-      );
-      const updated = {
-        ...acc,
-        accessToken: r.access_token,
-        tokenIssuedAt: Date.now(),
-        tokenExpiresAt: Date.now() + (r.expires_in || 5184000) * 1000,
-        needsReconnect: false,
-      };
-      await store.setJSON(accountId, updated);
-      return updated;
-    } catch {
-      return acc; // old token is still valid until it expires
-    }
+    throw Object.assign(new Error("Instagram access expired. Reconnect the account."), { code: "expired" });
   }
   return acc;
 }
