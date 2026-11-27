@@ -1,0 +1,21 @@
+[
+ {"s": 3.0, "e": 7.0, "text": "T, P, D, I. The best drop|for this one is worth *360*!"},
+ {"s": 7.0, "e": 12.0, "text": "Where's the 360?|Turning it round..."},
+ {"s": 12.0, "e": 17.0, "text": "Still looking...|I can't find it."},
+ {"s": 17.0, "e": 21.5, "text": "OK. Slow and steady.|*One word at a time.*"},
+ {"s": 21.5, "e": 26.0, "text": "*DIN.* +30. Not the 360,|but it's a start."},
+ {"s": 26.0, "e": 28.5, "text": "*DOT!* +30.|Best possible drop."},
+ {"s": 28.5, "e": 34.5, "text": "C, A, I, N.|Best possible: 60."},
+ {"s": 34.5, "e": 38.0, "text": "*COIN!* +60.|Best possible again."},
+ {"s": 38.0, "e": 42.0, "text": "R, H, O, W.|Only 30 here."},
+ {"s": 42.0, "e": 45.5, "text": "*WON!* +30. Best possible.|Four words in a row."},
+ {"s": 45.5, "e": 51.0, "text": "One more word for|the *streak bonus*..."},
+ {"s": 51.0, "e": 54.0, "text": "*SIC!* +30.|Best possible drop..."},
+ {"s": 54.0, "e": 58.0, "text": "*STREAK BONUS +300!*|180 to 480."},
+ {"s": 58.0, "e": 62.0, "text": "E, F, P, N: no word possible.|I'll park it."},
+ {"s": 62.0, "e": 67.0, "text": "*PEG.* +30.|The best was 120. Missed it."},
+ {"s": 67.0, "e": 70.0, "text": "*SEE!* +30.|Best possible drop."},
+ {"s": 70.0, "e": 74.0, "text": "Last block. A, R, E, G.|Only 30 on offer."},
+ {"s": 74.0, "e": 76.5, "text": "*RAN!* +30.|Best possible drop."},
+ {"s": 76.5, "e": 79.0, "text": "*570* on my first try.|Slow and steady!"}
+]
