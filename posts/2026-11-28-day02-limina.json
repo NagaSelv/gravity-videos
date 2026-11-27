@@ -5,9 +5,29 @@
     "channel": "@thetiredlinguist",
     "title": "Day 2 · Limina · six and a half minutes on one guess",
     "description": "a year of daily puzzles, played tiredly. Today: Limina #33. I made this game. It still took me seven guesses, the last one in extra time.\n\nPlay the free daily word puzzle: https://liminawordgame.com/?utm_source=youtube&utm_medium=social&utm_campaign=tiredlinguist&utm_content=day02\n\n#Shorts #limina #wordgame #wordpuzzle #dailypuzzle #brainteaser #puzzlegame",
-    "tags": ["the tired linguist", "limina", "word game", "word puzzle", "daily puzzle", "brain teaser", "puzzle game", "linguistics"],
+    "tags": [
+      "the tired linguist",
+      "limina",
+      "word game",
+      "word puzzle",
+      "daily puzzle",
+      "brain teaser",
+      "puzzle game",
+      "linguistics"
+    ],
     "categoryId": "20",
     "madeForKids": false,
     "privacy": "public"
+  },
+  "results": {
+    "youtube:@thetiredlinguist": {
+      "status": "scheduled",
+      "channel": "The Tired Linguist",
+      "videoId": "w4QdEsL7bME",
+      "url": "https://youtube.com/shorts/w4QdEsL7bME",
+      "publishAt": "2026-11-27T16:15:00.000Z",
+      "privacy": "private",
+      "uploadedAt": "2026-11-27T03:37:21.341Z"
+    }
   }
 }
