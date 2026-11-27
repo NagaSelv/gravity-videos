@@ -26,7 +26,7 @@
       "status": "waiting",
       "reason": "channel daily upload limit; retrying",
       "error": "YouTube refused the upload: The user has exceeded the number of videos they may upload.",
-      "lastTry": "2026-11-27T09:02:55.898Z"
+      "lastTry": "2026-11-27T11:32:40.557Z"
     }
   }
 }
