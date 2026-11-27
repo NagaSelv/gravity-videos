@@ -6,6 +6,7 @@ which uploads the video to YouTube and schedules it. Results are written back in
 ```json
 {
   "video": "videos/2026-11-27-hsc.mp4",
+  "thumbnail": "videos/2026-11-27-hsc_thumb.png",
   "publishAt": "2026-11-28T09:00:00+08:00",
   "youtube": {
     "channel": "@gravitywordgame",
@@ -20,6 +21,10 @@ which uploads the video to YouTube and schedules it. Results are written back in
 ```
 
 - `video`: path in this repo (or `videoUrl`: any public https URL).
+- `thumbnail` (optional): path in this repo to a .png or .jpg under 2 MB (or `thumbnailUrl`). Set as the custom
+  thumbnail right after the upload. Needs the channel's intermediate features (verified phone number).
+  Adding it to a post that's already uploaded sets the thumbnail on the next run. Result under `"results"`:
+  `"thumbnail": "set"`, or `"failed"` with `thumbnailError` (retried hourly, up to 3 attempts).
 - `publishAt`: when it goes public. Leave it out, or give a time in the past, to publish straight away.
   Further ahead than 10 minutes, the video is uploaded now as private and YouTube publishes it at that time.
 - `youtube.channel`: the channel's @handle, its title, or its UC… ID, as connected at
