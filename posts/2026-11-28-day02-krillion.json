@@ -22,5 +22,13 @@
     "account": "@thetiredlinguist",
     "caption": "Day 2 · Krillion dive #135\n\na year of daily puzzles, played tiredly. Rarer answers sink deeper. Thinking like an old person helped: 310, better than 63% of today's players.\n\nI also make a daily word puzzle: liminawordgame.com\n\n#krillion #trivia #wordgame #dailypuzzle #puzzlegame #linguistics #thetiredlinguist",
     "shareToFeed": true
+  },
+  "results": {
+    "youtube:@thetiredlinguist": {
+      "status": "waiting",
+      "reason": "channel daily upload limit; retrying",
+      "error": "YouTube refused the upload: The user has exceeded the number of videos they may upload.",
+      "lastTry": "2026-11-27T11:41:40.736Z"
+    }
   }
 }
