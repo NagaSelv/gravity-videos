@@ -62,10 +62,13 @@ export async function connectInstagram(code, req) {
     "Token check"
   );
   const scopes = dbg.data?.granular_scopes || [];
-  const ids = new Set(
-    scopes.filter((s) => /^instagram_(content_publish|basic)$/.test(s.scope)).flatMap((s) => s.target_ids || [])
-  );
-  if (!ids.size) throw new Error("No Instagram account was shared. Connect again and tick your Instagram account(s).");
+  const ids = new Set(scopes.filter((s) => /^instagram_/.test(s.scope)).flatMap((s) => s.target_ids || []));
+  // System-user tokens may not list target IDs; also try the accounts named in INSTAGRAM_ACCOUNT_IDS.
+  for (const id of (process.env.INSTAGRAM_ACCOUNT_IDS || "").split(/[\s,]+/).filter(Boolean)) ids.add(id);
+  if (!ids.size) {
+    const seen = scopes.map((s) => `${s.scope}${s.target_ids ? `[${s.target_ids.length}]` : ""}`).join(", ");
+    throw new Error(`No Instagram account was shared. Token scopes: ${seen || "none"}`);
+  }
 
   const store = igStore();
   const saved = [];
@@ -89,7 +92,10 @@ export async function connectInstagram(code, req) {
     await store.setJSON(account.id, account);
     saved.push(account);
   }
-  if (!saved.length) throw new Error("Couldn't read the shared Instagram account(s).");
+  if (!saved.length) {
+    const seen = scopes.map((s) => `${s.scope}${s.target_ids ? `[${s.target_ids.join("/")}]` : ""}`).join(", ");
+    throw new Error(`Couldn't read the shared Instagram account(s). Token scopes: ${seen || "none"}`);
+  }
   return saved;
 }
 
