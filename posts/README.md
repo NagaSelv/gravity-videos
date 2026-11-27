@@ -35,3 +35,26 @@ which uploads the video to YouTube and schedules it. Results are written back in
 - `notifySubscribers`: set to `false` to upload without notifying subscribers (default `true`).
 - Results appear under `"results"`: `scheduled` / `published` with the video URL, or `failed` with the error.
   Failed uploads are retried hourly, up to 3 attempts. Posts due more than 3 days ago are skipped.
+
+## Instagram
+
+Add an `instagram` target (or a list of them) to post the same video as a Reel:
+
+```json
+"instagram": {
+  "account": "@gravitywordgame",
+  "caption": "Can you beat 690? … #wordgame #puzzle",
+  "shareToFeed": true,
+  "thumbOffset": 1500
+}
+```
+
+- `account`: the @username, as connected at https://tired-linguist-poster.netlify.app/app/.
+- `caption`: up to 2,200 characters and 30 hashtags.
+- `thumbOffset` (optional): which frame to use as the cover, in milliseconds. Or `coverUrl`: a public image URL.
+- Instagram's API can't schedule, so the Action checks every 15 minutes and publishes once `publishAt` is reached
+  (GitHub can run it a few minutes late). With no `publishAt` it publishes on the next run.
+- Instagram fetches the video from a public URL of the repo file, so the repo must stay public.
+
+YouTube note: if a channel hits YouTube's daily upload limit, the post shows `waiting` and retries automatically.
+

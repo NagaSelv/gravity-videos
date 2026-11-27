@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths: ["posts/**"]
   schedule:
-    - cron: "23 * * * *" # hourly: retries anything that failed
+    - cron: "*/15 * * * *" # every 15 min: Instagram posts when due, plus retries
   workflow_dispatch:
     inputs:
       dry_run:

@@ -1,4 +1,4 @@
-// Tired Linguist Poster: uploads queued posts in posts/*.json to YouTube.
+// Tired Linguist Poster: publishes queued posts in posts/*.json to YouTube and Instagram.
 // Runs in GitHub Actions (.github/workflows/post.yml). No dependencies: Node 20+.
 //
 // Env: POSTER_URL (Netlify site), POSTER_API_KEY, GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_SHA
@@ -11,6 +11,10 @@ const POSTS_DIR = "posts";
 const MAX_ATTEMPTS = 3;
 const STALE_DAYS = 3; // never post something that was due more than this long ago
 const SCHEDULE_MARGIN_MS = 10 * 60 * 1000; // closer than this to now => publish immediately
+const IG_EARLY_MS = 3 * 60 * 1000; // Instagram has no scheduling: publish once due (minus this)
+const IG_API = "https://graph.instagram.com/v25.0";
+const UPLOAD_CAP = /exceeded the number of videos/i; // YouTube per-channel daily cap: wait, don't count
+const WAIT_RETRY_MS = 2 * 60 * 60 * 1000; // retry capped channels every 2 hours
 
 const { POSTER_URL, POSTER_API_KEY, GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_SHA, DRY_RUN } = process.env;
 
@@ -155,10 +159,88 @@ async function uploadToYouTube(target, publishAt, video) {
   };
 }
 
+let igCache;
+async function resolveIgAccount(ref) {
+  igCache ??= (await poster("/api/instagram/accounts")).accounts;
+  const r = String(ref).trim().toLowerCase().replace(/^@/, "");
+  const acc = igCache.find((a) => a.id === r || a.username.toLowerCase() === r);
+  if (!acc) {
+    const names = igCache.map((a) => a.handle).join(", ") || "none";
+    throw new Error(`Instagram account "${ref}" is not connected. Connected: ${names}`);
+  }
+  return acc;
+}
+
+function igVideoUrls(post) {
+  if (post.videoUrl) return [post.videoUrl];
+  const repoPath = post.video.split("/").map(encodeURIComponent).join("/");
+  return [
+    `https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@${GITHUB_SHA}/${repoPath}`, // served as video/mp4
+    `https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/${repoPath}`,
+  ];
+}
+
+async function ig(pathname, params, token, method = "GET") {
+  const qs = new URLSearchParams({ ...params, access_token: token });
+  const res = await fetch(`${IG_API}${pathname}${method === "GET" ? `?${qs}` : ""}`, {
+    method,
+    ...(method === "POST" ? { headers: { "content-type": "application/x-www-form-urlencoded" }, body: qs } : {}),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) throw new Error(`Instagram ${pathname}: ${data.error?.message || res.status}`);
+  return data;
+}
+
+async function publishToInstagram(target, post) {
+  const acc = await resolveIgAccount(target.account);
+  const { accessToken } = await poster("/api/instagram/token", {
+    method: "POST",
+    body: JSON.stringify({ accountId: acc.id }),
+  });
+  let lastErr;
+  for (const videoUrl of igVideoUrls(post)) {
+    const params = { media_type: "REELS", video_url: videoUrl, share_to_feed: String(target.shareToFeed !== false) };
+    if (target.caption) params.caption = target.caption;
+    if (target.thumbOffset != null) params.thumb_offset = String(target.thumbOffset);
+    if (target.coverUrl) params.cover_url = target.coverUrl;
+    const { id: container } = await ig(`/${acc.id}/media`, params, accessToken, "POST");
+
+    // Instagram fetches and processes the video; wait for it (up to 10 minutes).
+    let status = "IN_PROGRESS", detail = "";
+    for (let i = 0; i < 60 && status === "IN_PROGRESS"; i++) {
+      await new Promise((r) => setTimeout(r, 10000));
+      const c = await ig(`/${container}`, { fields: "status_code,status" }, accessToken);
+      status = c.status_code;
+      detail = c.status || "";
+    }
+    if (status === "FINISHED") {
+      const { id: mediaId } = await ig(`/${acc.id}/media_publish`, { creation_id: container }, accessToken, "POST");
+      const media = await ig(`/${mediaId}`, { fields: "permalink" }, accessToken).catch(() => ({}));
+      return {
+        status: "published",
+        channel: acc.handle,
+        mediaId,
+        url: media.permalink || null,
+        publishedAt: now().toISOString(),
+      };
+    }
+    lastErr = new Error(`Instagram couldn't process the video (${status}${detail ? `: ${detail}` : ""}) from ${new URL(videoUrl).host}`);
+    log(`  ${lastErr.message}; trying next source`);
+  }
+  throw lastErr;
+}
+
 function validate(post, file) {
   const errs = [];
   const targets = [].concat(post.youtube || []);
-  if (!targets.length) errs.push('no "youtube" target');
+  const igTargets = [].concat(post.instagram || []);
+  if (!targets.length && !igTargets.length) errs.push('no "youtube" or "instagram" target');
+  for (const t of igTargets) {
+    if (!t.account) errs.push("instagram target needs account");
+    if ((t.caption || "").length > 2200) errs.push("instagram caption is over 2200 characters");
+    if (((t.caption || "").match(/#\w/g) || []).length > 30) errs.push("instagram caption has more than 30 hashtags");
+  }
+  if (igTargets.length && !post.video && !post.videoUrl) errs.push("instagram needs video or videoUrl");
   if (post.publishAt && isNaN(new Date(post.publishAt))) errs.push("publishAt is not a valid date");
   if (post.thumbnail && !/\.(png|jpe?g)$/i.test(post.thumbnail)) errs.push("thumbnail must be a .png or .jpg");
   for (const t of targets) {
@@ -216,7 +298,7 @@ async function main() {
       return true;
     };
 
-    for (const target of [].concat(post.youtube)) {
+    for (const target of [].concat(post.youtube || [])) {
       const key = `youtube:${target.channel}`;
       const prev = post.results[key];
       if (prev && ["scheduled", "published", "uploaded"].includes(prev.status)) {
@@ -226,6 +308,7 @@ async function main() {
       }
       if (prev?.status === "skipped") continue;
       if (prev?.status === "failed" && prev.attempts >= MAX_ATTEMPTS) continue;
+      if (prev?.status === "waiting" && now() - new Date(prev.lastTry) < WAIT_RETRY_MS) continue;
 
       const due = post.publishAt ? new Date(post.publishAt) : null;
       if (due && now() - due > STALE_DAYS * 864e5) {
@@ -247,9 +330,49 @@ async function main() {
         log(`✓ ${f} → ${post.results[key].channel}: ${post.results[key].status} ${post.results[key].url}`);
         await applyThumbnail(target, post.results[key]);
       } catch (e) {
+        if (UPLOAD_CAP.test(e.message)) {
+          // Channel hit YouTube's daily upload cap: keep waiting, retry on later runs.
+          post.results[key] = { status: "waiting", reason: "channel daily upload limit; retrying", error: e.message, lastTry: now().toISOString() };
+          log(`… ${f} → ${target.channel}: daily upload limit reached, will retry later`);
+        } else {
+          const attempts = (prev?.attempts || 0) + 1;
+          post.results[key] = { status: "failed", error: e.message, attempts, lastTry: now().toISOString() };
+          log(`✗ ${f} → ${target.channel}: ${e.message} (attempt ${attempts}/${MAX_ATTEMPTS})`);
+          failures++;
+        }
+      }
+      dirty = true;
+    }
+
+    for (const target of [].concat(post.instagram || [])) {
+      const key = `instagram:${target.account}`;
+      const prev = post.results[key];
+      if (prev && ["published", "skipped"].includes(prev.status)) continue;
+      if (prev?.status === "failed" && prev.attempts >= MAX_ATTEMPTS) continue;
+
+      const due = post.publishAt ? new Date(post.publishAt) : null;
+      if (due && now() - due > STALE_DAYS * 864e5) {
+        post.results[key] = { status: "skipped", reason: `due more than ${STALE_DAYS} days ago` };
+        dirty = true;
+        log(`- ${f} → Instagram ${target.account}: skipped (stale)`);
+        continue;
+      }
+      if (due && due - now() > IG_EARLY_MS) {
+        log(`… ${f} → Instagram ${target.account}: waiting until ${due.toISOString()}`);
+        continue;
+      }
+      if (DRY_RUN) {
+        log(`~ ${f} → Instagram ${target.account}: would publish from ${igVideoUrls(post)[0]}`);
+        continue;
+      }
+      try {
+        log(`↑ ${f} → Instagram ${target.account}: publishing`);
+        post.results[key] = await publishToInstagram(target, post);
+        log(`✓ ${f} → Instagram ${post.results[key].channel}: published ${post.results[key].url || post.results[key].mediaId}`);
+      } catch (e) {
         const attempts = (prev?.attempts || 0) + 1;
         post.results[key] = { status: "failed", error: e.message, attempts, lastTry: now().toISOString() };
-        log(`✗ ${f} → ${target.channel}: ${e.message} (attempt ${attempts}/${MAX_ATTEMPTS})`);
+        log(`✗ ${f} → Instagram ${target.account}: ${e.message} (attempt ${attempts}/${MAX_ATTEMPTS})`);
         failures++;
       }
       dirty = true;

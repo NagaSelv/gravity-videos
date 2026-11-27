@@ -72,6 +72,15 @@
     </div>
 
     <div class="card">
+      <div class="row" style="margin-bottom:8px">
+        <h2 style="margin:0">Instagram accounts</h2>
+        <a class="btn primary" href="/auth/instagram/start">+ Connect an account</a>
+      </div>
+      <p class="muted" style="margin-top:0">Professional accounts only. Instagram asks you to log in; log in as the account you want to connect (log out of Instagram in this browser first to switch).</p>
+      <div id="igAccounts"><p class="muted">Loading…</p></div>
+    </div>
+
+    <div class="card">
       <h2>Recent posts</h2>
       <div id="posts"><p class="muted">Loading…</p></div>
       <p class="muted" style="margin-bottom:0">Posts are files in <a href="https://github.com/NagaSelv/gravity-videos/tree/main/posts" target="_blank">gravity-videos/posts</a>.
@@ -94,7 +103,8 @@ async function api(path, opts = {}) {
 }
 
 function flashFromUrl() {
-  const p = new URLSearchParams(location.search).get("yt");
+  const q = new URLSearchParams(location.search);
+  const p = q.get("yt") || q.get("ig");
   if (!p) return;
   const msgs = {
     login_first: "Sign in first, then connect the channel.",
@@ -102,6 +112,7 @@ function flashFromUrl() {
     no_refresh_token: "Google didn't give long-term access. Remove the app at myaccount.google.com/permissions and connect again.",
     no_channel_on_account: "That Google account has no YouTube channel.",
     google_access_denied: "Connection cancelled.",
+    not_configured: "Instagram isn't set up yet: add INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET in Netlify.",
   };
   let text = msgs[p] || (p.startsWith("connected:") ? `Connected ${p.slice(10)}.` : `Something went wrong: ${p.replace(/^error:/, "")}`);
   $("flash").textContent = text;
@@ -134,6 +145,29 @@ $("channels").addEventListener("click", async (e) => {
   loadChannels();
 });
 
+async function loadIgAccounts() {
+  const { accounts } = await api("/api/instagram/accounts");
+  if (!accounts.length) { $("igAccounts").innerHTML = '<p class="muted">No accounts connected yet.</p>'; return; }
+  $("igAccounts").innerHTML = accounts.map((a) => {
+    const days = Math.round((a.tokenExpiresAt - Date.now()) / 864e5);
+    const pill = a.needsReconnect || days < 0 ? `<a class="pill bad" href="/auth/instagram/start">Reconnect</a>` : `<span class="pill ok">Connected</span>`;
+    return `<div class="ch">
+      ${a.picture ? `<img src="${esc(a.picture)}" alt="">` : ""}
+      <div class="info"><div><b>${esc(a.handle)}</b> <span class="muted">${esc((a.accountType || "").toLowerCase())}</span></div>
+        <div class="id">${esc(a.id)} · sign-in renews automatically</div></div>
+      ${pill}
+      <button class="link" data-igremove="${esc(a.id)}" data-title="${esc(a.handle)}">Remove</button>
+    </div>`;
+  }).join("");
+}
+
+$("igAccounts").addEventListener("click", async (e) => {
+  const id = e.target.dataset.igremove;
+  if (!id || !confirm(`Disconnect ${e.target.dataset.title}?`)) return;
+  await api(`/api/instagram/accounts?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  loadIgAccounts();
+});
+
 async function loadPosts() {
   try {
     const list = await fetch("https://api.github.com/repos/NagaSelv/gravity-videos/contents/posts?ref=main").then((r) => r.json());
@@ -141,13 +175,14 @@ async function loadPosts() {
     if (!files.length) { $("posts").innerHTML = '<p class="muted">No posts yet.</p>'; return; }
     const posts = await Promise.all(files.map((f) => fetch(f.download_url, { cache: "no-store" }).then((r) => r.json()).then((p) => ({ name: f.name, ...p })).catch(() => null)));
     $("posts").innerHTML = posts.filter(Boolean).map((p) => {
-      const targets = [].concat(p.youtube || []);
+      const targets = [].concat(p.youtube || []).map((t) => ({ ...t, key: `youtube:${t.channel}`, to: t.channel, label: t.title }))
+        .concat([].concat(p.instagram || []).map((t) => ({ ...t, key: `instagram:${t.account}`, to: `Instagram ${t.account}`, label: (t.caption || "").split("\n")[0].slice(0, 60) })));
       const rows = targets.map((t) => {
-        const r = (p.results || {})[`youtube:${t.channel}`];
+        const r = (p.results || {})[t.key];
         const st = r?.status || "queued";
         const cls = { scheduled: "ok", published: "ok", uploaded: "ok", failed: "bad", skipped: "warn" }[st] || "warn";
         const extra = r?.url ? ` · <a href="${esc(r.url)}" target="_blank">video</a>` : r?.error ? ` · ${esc(r.error)}` : "";
-        return `<div class="muted"><span class="pill ${cls}">${esc(st)}</span> ${esc(t.title)} → ${esc(r?.channel || t.channel)}${extra}</div>`;
+        return `<div class="muted"><span class="pill ${cls}">${esc(st)}</span> ${esc(t.label)} → ${esc(r?.channel || t.to)}${extra}</div>`;
       }).join("");
       return `<div class="post"><div class="t">${esc(p.name.replace(/\.json$/, ""))}</div>
         <div class="muted">${p.publishAt ? `Goes public ${esc(fmt(p.publishAt))}` : "Publish immediately"}</div>${rows}</div>`;
@@ -167,7 +202,7 @@ async function init() {
   show($("login"), !me.loggedIn);
   show($("dash"), me.loggedIn);
   show($("logout"), me.loggedIn);
-  if (me.loggedIn) { loadChannels(); loadPosts(); }
+  if (me.loggedIn) { loadChannels(); loadIgAccounts().catch(() => {}); loadPosts(); }
 }
 
 $("loginForm").addEventListener("submit", async (e) => {

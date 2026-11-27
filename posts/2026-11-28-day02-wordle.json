@@ -23,9 +23,9 @@
   },
   "results": {
     "youtube:@thetiredlinguist": {
-      "status": "failed",
+      "status": "waiting",
+      "reason": "channel daily upload limit; retrying",
       "error": "YouTube refused the upload: The user has exceeded the number of videos they may upload.",
-      "attempts": 3,
       "lastTry": "2026-11-27T04:44:00.336Z"
     }
   }
