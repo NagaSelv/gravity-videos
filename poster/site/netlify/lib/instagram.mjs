@@ -51,50 +51,44 @@ export async function connectInstagram(code, req) {
   );
   const token = tok.access_token;
 
-  // Which Instagram accounts did the login grant? debug_token lists them per permission.
-  const dbg = await fbJson(
-    await fetch(
-      `${FB_GRAPH}/debug_token?${new URLSearchParams({
-        input_token: token,
-        access_token: `${process.env.META_APP_ID}|${process.env.META_APP_SECRET}`,
-      })}`
-    ),
-    "Token check"
-  );
-  const scopes = dbg.data?.granular_scopes || [];
-  const ids = new Set(scopes.filter((s) => /^instagram_/.test(s.scope)).flatMap((s) => s.target_ids || []));
-  // System-user tokens may not list target IDs; also try the accounts named in INSTAGRAM_ACCOUNT_IDS.
-  for (const id of (process.env.INSTAGRAM_ACCOUNT_IDS || "").split(/[\s,]+/).filter(Boolean)) ids.add(id);
-  if (!ids.size) {
-    const seen = scopes.map((s) => `${s.scope}${s.target_ids ? `[${s.target_ids.length}]` : ""}`).join(", ");
-    throw new Error(`No Instagram account was shared. Token scopes: ${seen || "none"}`);
+  // Which Instagram accounts did the login share? /me is the system user; its assigned accounts are listed here.
+  const found = new Map();
+  let next = `${FB_GRAPH}/me/assigned_instagram_accounts?${new URLSearchParams({ fields: "id,username", limit: "50", access_token: token })}`;
+  let listError = null;
+  while (next) {
+    try {
+      const page = await fbJson(await fetch(next), "Listing Instagram accounts");
+      for (const a of page.data || []) if (a.id && a.username) found.set(String(a.id), a.username);
+      next = page.paging?.next || null;
+    } catch (e) {
+      listError = e.message;
+      next = null;
+    }
+  }
+  if (!found.size) {
+    throw new Error(`No Instagram account was shared${listError ? ` (${listError})` : ""}. Connect again and tick your Instagram account(s).`);
   }
 
   const store = igStore();
   const saved = [];
-  for (const id of ids) {
-    const me = await fbJson(
-      await fetch(`${FB_GRAPH}/${id}?${new URLSearchParams({ fields: "username,profile_picture_url", access_token: token })}`),
-      "Account lookup"
-    ).catch(() => null);
-    if (!me?.username) continue; // not an Instagram account
+  for (const [id, username] of found) {
+    const pic = await fetch(`${FB_GRAPH}/${id}?${new URLSearchParams({ fields: "profile_picture_url", access_token: token })}`)
+      .then((r) => r.json())
+      .then((d) => d.profile_picture_url || null)
+      .catch(() => null);
     const account = {
-      id: String(id),
-      username: me.username,
-      handle: `@${me.username}`,
-      picture: me.profile_picture_url || null,
+      id,
+      username,
+      handle: `@${username}`,
+      picture: pic,
       accessToken: token,
       tokenType: "system-user",
-      tokenExpiresAt: dbg.data?.expires_at ? dbg.data.expires_at * 1000 : null, // null = never
+      tokenExpiresAt: null, // system-user tokens from Unified Login don't expire
       connectedAt: new Date().toISOString(),
       needsReconnect: false,
     };
     await store.setJSON(account.id, account);
     saved.push(account);
-  }
-  if (!saved.length) {
-    const seen = scopes.map((s) => `${s.scope}${s.target_ids ? `[${s.target_ids.join("/")}]` : ""}`).join(", ");
-    throw new Error(`Couldn't read the shared Instagram account(s). Token scopes: ${seen || "none"}`);
   }
   return saved;
 }
