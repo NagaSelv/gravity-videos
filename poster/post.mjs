@@ -41,21 +41,52 @@ async function resolveChannel(ref) {
   return ch;
 }
 
-async function loadVideo(post) {
-  if (post.videoUrl) {
-    const res = await fetch(post.videoUrl);
-    if (!res.ok) throw new Error(`Could not download ${post.videoUrl}: ${res.status}`);
+async function loadFile(repoPath, url, what) {
+  if (url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Could not download ${url}: ${res.status}`);
     return Buffer.from(await res.arrayBuffer());
   }
-  if (!post.video) throw new Error('Post needs "video" (repo path) or "videoUrl"');
-  if (fs.existsSync(post.video)) return fs.readFileSync(post.video);
+  if (!repoPath) throw new Error(`Post needs a ${what} path or URL`);
+  if (fs.existsSync(repoPath)) return fs.readFileSync(repoPath);
   // Sparse checkout: fetch the file from the repo through the API.
-  const url = `https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/${post.video}?ref=${GITHUB_SHA}`;
-  const res = await fetch(url, {
+  const api = `https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/${repoPath}?ref=${GITHUB_SHA}`;
+  const res = await fetch(api, {
     headers: { authorization: `Bearer ${GITHUB_TOKEN}`, accept: "application/vnd.github.raw" },
   });
-  if (!res.ok) throw new Error(`Could not fetch ${post.video} from the repo: ${res.status}`);
+  if (!res.ok) throw new Error(`Could not fetch ${repoPath} from the repo: ${res.status}`);
   return Buffer.from(await res.arrayBuffer());
+}
+
+const loadVideo = (post) => {
+  if (!post.video && !post.videoUrl) throw new Error('Post needs "video" (repo path) or "videoUrl"');
+  return loadFile(post.video, post.videoUrl, "video");
+};
+const hasThumbnail = (post) => Boolean(post.thumbnail || post.thumbnailUrl);
+const loadThumbnail = (post) => loadFile(post.thumbnail, post.thumbnailUrl, "thumbnail");
+
+async function accessTokenFor(channelRef) {
+  const ch = await resolveChannel(channelRef);
+  const { accessToken } = await poster("/api/youtube/token", {
+    method: "POST",
+    body: JSON.stringify({ channelId: ch.id }),
+  });
+  return { ch, accessToken };
+}
+
+// Custom thumbnail (needs the channel's intermediate features, i.e. a verified phone number).
+async function setThumbnail(target, videoId, image) {
+  if (image.length > 2 * 1024 * 1024) throw new Error("thumbnail is over YouTube's 2 MB limit");
+  const { accessToken } = await accessTokenFor(target.channel);
+  const type = image.subarray(0, 4).toString("hex") === "89504e47" ? "image/png" : "image/jpeg";
+  const res = await fetch(
+    `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${encodeURIComponent(videoId)}&uploadType=media`,
+    { method: "POST", headers: { authorization: `Bearer ${accessToken}`, "content-type": type }, body: image }
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`YouTube refused the thumbnail: ${err?.error?.message || res.status}`);
+  }
 }
 
 function youtubeStatus(target, publishAt) {
@@ -74,11 +105,7 @@ function youtubeStatus(target, publishAt) {
 }
 
 async function uploadToYouTube(target, publishAt, video) {
-  const ch = await resolveChannel(target.channel);
-  const { accessToken } = await poster("/api/youtube/token", {
-    method: "POST",
-    body: JSON.stringify({ channelId: ch.id }),
-  });
+  const { ch, accessToken } = await accessTokenFor(target.channel);
 
   const metadata = {
     snippet: {
@@ -133,6 +160,7 @@ function validate(post, file) {
   const targets = [].concat(post.youtube || []);
   if (!targets.length) errs.push('no "youtube" target');
   if (post.publishAt && isNaN(new Date(post.publishAt))) errs.push("publishAt is not a valid date");
+  if (post.thumbnail && !/\.(png|jpe?g)$/i.test(post.thumbnail)) errs.push("thumbnail must be a .png or .jpg");
   for (const t of targets) {
     if (!t.channel) errs.push("youtube target needs channel");
     if (!t.title) errs.push("youtube target needs title");
@@ -162,12 +190,41 @@ async function main() {
     }
     post.results ??= {};
     let video = null;
+    let thumb = null;
     let dirty = false;
+
+    const applyThumbnail = async (target, res) => {
+      if (!hasThumbnail(post) || !res?.videoId || res.thumbnail === "set") return false;
+      if ((res.thumbnailAttempts || 0) >= MAX_ATTEMPTS) return false;
+      if (DRY_RUN) {
+        log(`~ ${f} → ${target.channel}: would set thumbnail`);
+        return false;
+      }
+      try {
+        thumb ??= await loadThumbnail(post);
+        await setThumbnail(target, res.videoId, thumb);
+        res.thumbnail = "set";
+        delete res.thumbnailError;
+        log(`✓ ${f} → ${target.channel}: thumbnail set`);
+      } catch (e) {
+        res.thumbnailAttempts = (res.thumbnailAttempts || 0) + 1;
+        res.thumbnail = "failed";
+        res.thumbnailError = e.message;
+        log(`✗ ${f} → ${target.channel}: ${e.message} (thumbnail attempt ${res.thumbnailAttempts}/${MAX_ATTEMPTS})`);
+        failures++;
+      }
+      return true;
+    };
 
     for (const target of [].concat(post.youtube)) {
       const key = `youtube:${target.channel}`;
       const prev = post.results[key];
-      if (prev && ["scheduled", "published", "uploaded", "skipped"].includes(prev.status)) continue;
+      if (prev && ["scheduled", "published", "uploaded"].includes(prev.status)) {
+        // Video is up; add the thumbnail if one is listed and not set yet.
+        if (await applyThumbnail(target, prev)) dirty = true;
+        continue;
+      }
+      if (prev?.status === "skipped") continue;
       if (prev?.status === "failed" && prev.attempts >= MAX_ATTEMPTS) continue;
 
       const due = post.publishAt ? new Date(post.publishAt) : null;
@@ -188,6 +245,7 @@ async function main() {
         log(`↑ ${f} → ${target.channel}: uploading ${(video.length / 1e6).toFixed(1)} MB`);
         post.results[key] = await uploadToYouTube(target, post.publishAt, video);
         log(`✓ ${f} → ${post.results[key].channel}: ${post.results[key].status} ${post.results[key].url}`);
+        await applyThumbnail(target, post.results[key]);
       } catch (e) {
         const attempts = (prev?.attempts || 0) + 1;
         post.results[key] = { status: "failed", error: e.message, attempts, lastTry: now().toISOString() };
