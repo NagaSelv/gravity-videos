@@ -61,6 +61,8 @@ async function loadVideo(post) {
 function youtubeStatus(target, publishAt) {
   const privacy = target.privacy || "public";
   const status = { selfDeclaredMadeForKids: Boolean(target.madeForKids) };
+  // YouTube's "altered or synthetic content" label (e.g. a synthetic narration voice)
+  if (target.isAiGenerated !== undefined) status.containsSyntheticMedia = Boolean(target.isAiGenerated);
   const due = publishAt ? new Date(publishAt) : null;
   if (privacy === "public" && due && due - now() > SCHEDULE_MARGIN_MS) {
     status.privacyStatus = "private";
