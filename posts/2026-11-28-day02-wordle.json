@@ -28,10 +28,14 @@
   },
   "results": {
     "youtube:@thetiredlinguist": {
-      "status": "waiting",
-      "reason": "channel daily upload limit; retrying",
-      "error": "YouTube refused the upload: The user has exceeded the number of videos they may upload.",
-      "lastTry": "2026-11-27T11:32:40.557Z"
+      "status": "scheduled",
+      "channel": "The Tired Linguist",
+      "videoId": "GcrDiFq4VnY",
+      "url": "https://youtube.com/shorts/GcrDiFq4VnY",
+      "publishAt": "2026-11-28T08:15:00.000Z",
+      "privacy": "private",
+      "uploadedAt": "2026-11-27T16:37:56.999Z",
+      "thumbnail": "set"
     }
   }
 }
