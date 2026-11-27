@@ -1,0 +1,23 @@
+{
+  "raw": "/home/claude/d2/r2.mp4", "day": 2, "label": "day 2 · orbitle",
+  "layout": "scaled", "sfx": 0.3,
+  "card": {"name": "orbitle", "sub": "inside gravity", "aside": ["(I made this one too.)"], "pill": "spoiler warning · answer at the end"},
+  "pieces": [
+    {"s": 0.0,  "e": 8.0,  "dur": 2.5, "cap": "four blocks of letters.|one hidden six-letter word."},
+    {"s": 8.0,  "e": 11.5, "speed": 1.5, "cap": "guess 1.|every word I spell is a clue."},
+    {"s": 11.5, "e": 17.3, "speed": 2, "cap": "guess 1.|every word I spell is a clue."},
+    {"s": 17.3, "e": 23.5, "speed": 2, "cap": "guess 1.|every word I spell is a clue."},
+    {"s": 23.5, "e": 33.6, "speed": 2.5, "cap": "guess 1.|every word I spell is a clue."},
+    {"s": 33.6, "e": 36.8, "cap": "near: e docked. n and r orbit.|a out. two rs in the word."},
+    {"s": 36.8, "e": 39.8, "cap": "row: r docked.|o and w out."},
+    {"s": 39.8, "e": 42.8, "cap": "art: t docked. r not second.|r, e, t, then three to go."},
+    {"s": 42.8, "e": 62.5, "dur": 3.0, "cap": "n and r, still orbiting.|they're in there somewhere."},
+    {"s": 62.5, "e": 64.1, "cap": "guess 2.|put the orbiting letters to work."},
+    {"s": 64.1, "e": 75.4, "speed": 2, "cap": "guess 2.|put the orbiting letters to work."},
+    {"s": 75.4, "e": 77.8, "cap": "return.|two guesses."},
+    {"s": 77.8, "e": 81.5, "cap": "three stars.|a first. the orbits did the work."}
+  ],
+  "notes": [
+    {"dur": 4.5, "big": ["return: re-, \"back\",", "+ turn, from latin", "tornare, \"to turn", "on a lathe\"."], "small": ["a word about going round.", "found by letters going round."]}
+  ]
+}

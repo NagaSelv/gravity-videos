@@ -1,0 +1,31 @@
+{
+  "raw": "/home/claude/d2/r1.mp4", "day": 2, "label": "day 2 · gravity high score challenge",
+  "layout": "scaled", "sfx": 0.3,
+  "card": {"name": "gravity", "sub": "high score challenge", "aside": ["(I made this one too.)"], "pill": "spoiler warning · score at the end"},
+  "pieces": [
+    {"s": 0.3,  "e": 3.3,  "cap": "block one: no word possible.|two days running."},
+    {"s": 3.3,  "e": 21.4, "dur": 3.0, "cap": "block two. best possible: 360.|eighteen seconds of looking."},
+    {"s": 21.4, "e": 23.4, "cap": "din. 30.|the best was 360. never found it."},
+    {"s": 23.4, "e": 26.8, "speed": 1.5, "cap": "din. 30.|the best was 360. never found it."},
+    {"s": 26.8, "e": 28.8, "cap": "dot. 30.|best possible. slow and steady."},
+    {"s": 28.8, "e": 34.7, "speed": 2, "cap": "dot. 30.|best possible. slow and steady."},
+    {"s": 34.7, "e": 37.0, "cap": "coin. 60.|best possible again."},
+    {"s": 37.0, "e": 42.6, "speed": 2, "cap": "coin. 60.|best possible again."},
+    {"s": 42.6, "e": 44.6, "cap": "won. 30.|one word at a time."},
+    {"s": 44.6, "e": 51.3, "speed": 2, "cap": "won. 30.|one word at a time."},
+    {"s": 51.3, "e": 53.8, "cap": "sic. 30. best possible.|four in a row."},
+    {"s": 53.8, "e": 55.3, "cap": "streak bonus. 300.|steady pays, apparently."},
+    {"s": 55.3, "e": 58.3, "speed": 1.5, "cap": "streak bonus. 300.|steady pays, apparently."},
+    {"s": 58.3, "e": 59.4, "cap": "block seven: no word possible.|streak over."},
+    {"s": 59.4, "e": 61.8, "speed": 1.5, "cap": "block seven: no word possible.|streak over."},
+    {"s": 61.8, "e": 63.6, "cap": "peg. 30.|best possible was 120."},
+    {"s": 63.6, "e": 67.1, "speed": 1.5, "cap": "peg. 30.|best possible was 120."},
+    {"s": 67.1, "e": 68.8, "cap": "see. 30.|best possible."},
+    {"s": 68.8, "e": 74.1, "speed": 2, "cap": "see. 30.|best possible."},
+    {"s": 74.1, "e": 75.5, "cap": "ran. 30.|best possible, to finish."},
+    {"s": 75.5, "e": 79.4, "cap": "570. try 1 of 3.|eight words, all short ones."}
+  ],
+  "notes": [
+    {"dur": 4.5, "big": ["sic: latin for", "\"thus\" or \"so\"."], "small": ["editors write [sic] to mean:", "the mistake was in the original.", "today it was just thirty points."]}
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "raw": "/home/claude/d2/r3.mp4", "day": 2, "label": "day 2 · wordle",
+  "layout": "crop", "sfx": 0,
+  "card": {"name": "wordle", "sub": "#1987", "aside": [], "pill": "spoiler warning · answer at the end"},
+  "pieces": [
+    {"s": 0.0,   "e": 5.6,   "cap": "opener: react.|same as yesterday."},
+    {"s": 5.6,   "e": 8.0,   "speed": 1.5, "cap": "react: e and a,|both in the wrong spot."},
+    {"s": 8.0,   "e": 11.7,  "cap": "react: e and a,|both in the wrong spot."},
+    {"s": 11.7,  "e": 23.8,  "dur": 1.5, "cap": "sonic: s starts it.|o, n, i, c are out."},
+    {"s": 23.8,  "e": 28.6,  "speed": 1.5, "cap": "sonic: s starts it.|o, n, i, c are out."},
+    {"s": 28.6,  "e": 46.5,  "dur": 2.0, "cap": "dumpy: all grey.|useful, in its way."},
+    {"s": 46.5,  "e": 49.6,  "cap": "dumpy: all grey.|useful, in its way."},
+    {"s": 49.6,  "e": 83.0,  "dur": 2.5, "cap": "saves: a and e,|still in the wrong spots."},
+    {"s": 83.0,  "e": 85.7,  "cap": "saves: a and e,|still in the wrong spots."},
+    {"s": 85.7,  "e": 229.0, "dur": 2.6, "cap": "sweat: s _ e a _.|one guess left."},
+    {"s": 229.0, "e": 300.0, "dur": 3.0, "cap": "after s: h, k or l.|the greys ruled out the rest."},
+    {"s": 300.0, "e": 433.9, "dur": 4.5, "cap": "sheah. sleak. skeas.|not in the word list."},
+    {"s": 433.9, "e": 435.6, "cap": "sheah. sleak. skeas.|not in the word list."},
+    {"s": 435.6, "e": 438.0, "cap": "sheaf.|the h was right. the s wasn't."},
+    {"s": 438.0, "e": 441.0, "cap": "failed. streak: zero.|played 3, won 2."}
+  ],
+  "notes": [
+    {"dur": 5.0, "big": ["after s, english lets", "only a few consonants", "start a word:", "p, t, k, m, n, l, w."], "small": ["my greys had ruled out p, t, m, n, w.", "that left k, l, and h (as in sh).", "phonotactics was right. I just picked s."]}
+  ]
+}
