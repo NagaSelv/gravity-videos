@@ -51,6 +51,7 @@ Add an `instagram` target (or a list of them) to post the same video as a Reel:
 
 - `account`: the @username, as connected at https://tired-linguist-poster.netlify.app/app/.
 - `caption`: up to 2,200 characters and 30 hashtags.
+- `isAiGenerated` (optional): `true` adds Instagram's "AI info" label (e.g. a synthetic narration voice).
 - `thumbOffset` (optional): which frame to use as the cover, in milliseconds. Or `coverUrl`: a public image URL.
 - Instagram's API can't schedule, so the Action checks every 15 minutes and publishes once `publishAt` is reached
   (GitHub can run it a few minutes late). With no `publishAt` it publishes on the next run.

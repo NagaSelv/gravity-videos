@@ -203,6 +203,8 @@ async function publishToInstagram(target, post) {
     if (target.caption) params.caption = target.caption;
     if (target.thumbOffset != null) params.thumb_offset = String(target.thumbOffset);
     if (target.coverUrl) params.cover_url = target.coverUrl;
+    // Instagram's "AI info" label (is_ai_generated, Content Publishing API since June 2026)
+    if (target.isAiGenerated !== undefined) params.is_ai_generated = String(Boolean(target.isAiGenerated));
     const { id: container } = await ig(`/${acc.id}/media`, params, accessToken, "POST");
 
     // Instagram fetches and processes the video; wait for it (up to 10 minutes).
