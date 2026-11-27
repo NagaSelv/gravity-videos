@@ -25,5 +25,6 @@ which uploads the video to YouTube and schedules it. Results are written back in
 - `youtube.channel`: the channel's @handle, its title, or its UC… ID, as connected at
   https://tired-linguist-poster.netlify.app/app/. `youtube` can also be a list, for several channels.
 - `privacy`: `public` (default), `unlisted` or `private`.
+- `notifySubscribers`: set to `false` to upload without notifying subscribers (default `true`).
 - Results appear under `"results"`: `scheduled` / `published` with the video URL, or `failed` with the error.
   Failed uploads are retried hourly, up to 3 attempts. Posts due more than 3 days ago are skipped.

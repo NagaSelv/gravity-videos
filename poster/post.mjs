@@ -89,7 +89,7 @@ async function uploadToYouTube(target, publishAt, video) {
   };
 
   const init = await fetch(
-    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status&notifySubscribers=true",
+    `https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status&notifySubscribers=${target.notifySubscribers === false ? "false" : "true"}`,
     {
       method: "POST",
       headers: {

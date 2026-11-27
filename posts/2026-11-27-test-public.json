@@ -1,0 +1,12 @@
+{
+  "video": "tests/poster-public-test.mp4",
+  "youtube": {
+    "channel": "@thetiredlinguist",
+    "title": "Poster test 4 (public, delete me)",
+    "description": "Test upload from Tired Linguist Poster, checking that public uploads work.",
+    "categoryId": "20",
+    "madeForKids": false,
+    "privacy": "public",
+    "notifySubscribers": false
+  }
+}
