@@ -1,0 +1,39 @@
+{
+  "aside": ["(I made this one.", "still stared at it.)"],
+  "open_s": 3.0,
+  "end_s": 2.5,
+  "pieces": [
+    {"s": 1.6,   "e": 3.75,  "cap": "", "diag": "S0"},
+    {"s": 3.75,  "e": 5.35,  "cap": "grasp.|a before s. a start.", "diag": "S1"},
+    {"s": 6.2,   "e": 8.75,  "speed": 1.5, "cap": "grasp.|a before s. a start.", "diag": "S1"},
+    {"s": 8.75,  "e": 10.45, "cap": "sonic.|s is in. o, n, i, c are out.", "diag": "S1"},
+    {"s": 10.45, "e": 24.8,  "dur": 1.2, "cap": "sonic.|s is in. o, n, i, c are out.", "diag": "S1"},
+    {"s": 24.8,  "e": 29.9,  "speed": 3, "cap": "sonic.|s is in. o, n, i, c are out.", "diag": "S1"},
+    {"s": 29.9,  "e": 32.0,  "cap": "tweak.|e·a, wrong way round. a first.", "diag": "S2"},
+    {"s": 32.0,  "e": 56.6,  "dur": 1.2, "cap": "tweak.|e·a, wrong way round. a first.", "diag": "S2"},
+    {"s": 56.6,  "e": 61.4,  "speed": 3, "cap": "tweak.|e·a, wrong way round. a first.", "diag": "S2"},
+    {"s": 61.4,  "e": 62.9,  "cap": "bland.|a again. b, l, n, d out.", "diag": "S2"},
+    {"s": 62.9,  "e": 87.3,  "dur": 1.2, "cap": "bland.|a again. b, l, n, d out.", "diag": "S2"},
+    {"s": 87.3,  "e": 89.2,  "cap": "bland.|a again. b, l, n, d out.", "diag": "S2"},
+    {"s": 89.2,  "e": 93.4,  "speed": 4, "cap": "bland.|a again. b, l, n, d out.", "diag": "S2"},
+    {"s": 93.4,  "e": 96.0,  "cap": "mashy.|a, then m, then s.", "diag": "S3"},
+    {"s": 96.0,  "e": 472.5, "dur": 2.6, "cap": "one guess left.|six and a half minutes of this.", "diag": "S3"},
+    {"s": 472.5, "e": 479.4, "speed": 2.5, "cap": "one guess left.|six and a half minutes of this.", "diag": "S3"},
+    {"s": 479.4, "e": 481.8, "cap": "james.|a name. not in the word list.", "diag": "S3"},
+    {"s": 481.8, "e": 498.5, "dur": 1.0, "cap": "james.|a name. not in the word list.", "diag": "S3"},
+    {"s": 498.5, "e": 503.7, "speed": 2.5, "cap": "james.|a name. not in the word list.", "diag": "S3"},
+    {"s": 503.7, "e": 506.9, "cap": "fames.|a, m, s, e. all in order. no f.", "diag": "S4"},
+    {"s": 506.9, "e": 508.9, "cap": "extra time.|won't count for the streak.", "diag": "S4"},
+    {"s": 508.9, "e": 524.4, "dur": 1.0, "cap": "extra time.|won't count for the streak.", "diag": "S4"},
+    {"s": 524.4, "e": 527.0, "cap": "extra time.|won't count for the streak.", "diag": "S4"},
+    {"s": 527.0, "e": 531.0, "cap": "amuse.|guess seven. got there.", "diag": "S4"}
+  ],
+  "notes": [
+    {"dur": 4.0,
+     "big": ["amuse: from french", "amuser, to make", "someone stare", "and muse."],
+     "small": ["in english it first meant to fool:", "to distract, to delude.", "six and a half minutes. fair."]},
+    {"dur": 4.0,
+     "big": ["a·m·u·s·e:", "vowel, consonant, vowel,", "consonant, vowel.", "three different vowels."],
+     "small": ["about 30 common words fit that.", "above. alone. image. abuse.", "126 if you count every word wordle takes."]}
+  ]
+}
