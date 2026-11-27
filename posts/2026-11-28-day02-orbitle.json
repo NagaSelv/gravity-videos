@@ -18,5 +18,16 @@
     "categoryId": "20",
     "madeForKids": false,
     "privacy": "public"
+  },
+  "results": {
+    "youtube:@thetiredlinguist": {
+      "status": "scheduled",
+      "channel": "The Tired Linguist",
+      "videoId": "RjQt1zLeshc",
+      "url": "https://youtube.com/shorts/RjQt1zLeshc",
+      "publishAt": "2026-11-28T00:15:00.000Z",
+      "privacy": "private",
+      "uploadedAt": "2026-11-27T03:59:13.282Z"
+    }
   }
 }
