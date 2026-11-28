@@ -192,7 +192,15 @@ def run(cmd):
 
 
 def main(spec_path, out_path):
+    global DAY, RAW, OUT
     spec = json.load(open(spec_path))
+    DAY = spec.get('day', DAY); RAW = spec.get('raw', RAW)
+    OUT = os.path.splitext(out_path)[0] + '_build'; os.makedirs(OUT, exist_ok=True)
+    for k, d in spec.get('diagrams', {}).items():
+        im = Image.open(d['img']).convert('RGB')
+        im = recolour_bg(im, STRIP)
+        h = d.get('h', 170); im = im.resize((round(im.width * h / im.height), h), Image.LANCZOS)
+        STATES[k] = im
     opening_card(f'{OUT}/open.png', spec['aside'])
     hdr = {}
     for i, p in enumerate(spec['pieces']):
@@ -222,6 +230,20 @@ def main(spec_path, out_path):
              '-crf', '18', '-r', '30', f])
         return f
     files = [still(f'{OUT}/open.png', spec['open_s'], 'c_open')] + seg_files
+    for j, c in enumerate(spec.get('cards', [])):
+        im = Image.new('RGB', (W, H), CREAM); d = ImageDraw.Draw(im)
+        dia = recolour_bg(Image.open(c['img']).convert('RGB'), CREAM)
+        dw = 880; dia = dia.resize((dw, round(dia.height * dw / dia.width)), Image.LANCZOS)
+        y = (H - dia.height) // 2 - 120
+        d.text((96, y - 150), c.get('label', ''), font=inter(34), fill=GREY)
+        for i, line in enumerate(c.get('top', [])):
+            d.text((96, y - 100 + 0 * i), line, font=fraunces(62), fill=NAVY)
+        im.paste(dia, ((W - dw) // 2, y))
+        yy = y + dia.height + 70
+        for line in c.get('bottom', []):
+            d.text((96, yy), line, font=fraunces(58), fill=NAVY); yy += 74
+        im.save(f'{OUT}/card{j}.png')
+        files.append(still(f'{OUT}/card{j}.png', c['dur'], f'c_card{j}'))
     for j, n in enumerate(spec['notes']):
         note_card(f'{OUT}/note{j}.png', n['big'], n['small'])
         files.append(still(f'{OUT}/note{j}.png', n['dur'], f'c_note{j}'))

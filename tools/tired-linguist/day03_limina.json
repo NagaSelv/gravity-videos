@@ -1,0 +1,169 @@
+{
+  "day": 3,
+  "raw": "/home/claude/d3/raw.mp4",
+  "aside": [
+    "(I made this one.",
+    "the weekend edition won.)"
+  ],
+  "open_s": 3.0,
+  "end_s": 2.5,
+  "diagrams": {
+    "V1": {
+      "img": "/home/claude/d3/dg100.png",
+      "h": 150
+    },
+    "V2": {
+      "img": "/home/claude/d3/dg180.png",
+      "h": 190
+    }
+  },
+  "pieces": [
+    {
+      "s": 0.0,
+      "e": 3.4,
+      "dur": 2.0,
+      "cap": "weekend puzzle.|a harder word than usual.",
+      "diag": "S0"
+    },
+    {
+      "s": 3.4,
+      "e": 36.6,
+      "dur": 4.0,
+      "cap": "react, crush, dumpy,|night, tripe.",
+      "diag": "S0"
+    },
+    {
+      "s": 36.6,
+      "e": 52.3,
+      "dur": 2.0,
+      "cap": "no letter order. at all.|wears. six down.",
+      "diag": "S0"
+    },
+    {
+      "s": 52.3,
+      "e": 55.0,
+      "cap": "aww, you didn't solve it.|keep going. fine.",
+      "diag": "S0"
+    },
+    {
+      "s": 55.0,
+      "e": 91.0,
+      "dur": 3.5,
+      "cap": "cloud, plain, brine,|think. still nothing.",
+      "diag": "S0"
+    },
+    {
+      "s": 91.0,
+      "e": 94.0,
+      "cap": "stove: v and e,|in both orders.",
+      "diag": "V1"
+    },
+    {
+      "s": 94.0,
+      "e": 107.8,
+      "dur": 1.5,
+      "cap": "stove: v and e,|in both orders.",
+      "diag": "V1"
+    },
+    {
+      "s": 107.8,
+      "e": 111.0,
+      "cap": "leave: add l.|every pair, both ways.",
+      "diag": "V2"
+    },
+    {
+      "s": 111.0,
+      "e": 124.0,
+      "dur": 1.0,
+      "cap": "leave: add l.|every pair, both ways.",
+      "diag": "V2"
+    },
+    {
+      "s": 124.0,
+      "e": 127.0,
+      "cap": "levee. same three pairs.|still not it.",
+      "diag": "V2"
+    },
+    {
+      "s": 127.0,
+      "e": 143.2,
+      "dur": 1.0,
+      "cap": "levee. same three pairs.|still not it.",
+      "diag": "V2"
+    },
+    {
+      "s": 143.2,
+      "e": 146.2,
+      "cap": "glave: not in the list.|it's a medieval polearm.",
+      "diag": "V2"
+    },
+    {
+      "s": 146.2,
+      "e": 176.6,
+      "dur": 1.5,
+      "cap": "glave: not in the list.|it's a medieval polearm.",
+      "diag": "V2"
+    },
+    {
+      "s": 176.6,
+      "e": 179.6,
+      "cap": "elves. s is out.|fifteen guesses deep.",
+      "diag": "V2"
+    },
+    {
+      "s": 179.6,
+      "e": 228.3,
+      "dur": 2.0,
+      "cap": "a word that reads|the same both ways...",
+      "diag": "V2"
+    },
+    {
+      "s": 228.3,
+      "e": 231.3,
+      "cap": "evele. not a word.|close, in a way.",
+      "diag": "V2"
+    },
+    {
+      "s": 231.3,
+      "e": 247.6,
+      "dur": 1.2,
+      "cap": "evele. not a word.|close, in a way.",
+      "diag": "V2"
+    },
+    {
+      "s": 247.6,
+      "e": 251.4,
+      "cap": "level. guess fifteen.|extra time. no streak.",
+      "diag": "V2"
+    }
+  ],
+  "cards": [
+    {
+      "dur": 4.0,
+      "img": "/home/claude/d3/dg180.png",
+      "label": "the cool diagram",
+      "top": [],
+      "bottom": [
+        "every pair, both ways.",
+        "that's a palindrome",
+        "drawn as a graph."
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "dur": 4.5,
+      "big": [
+        "level: a noun,",
+        "an adjective and a verb.",
+        "a level, level ground,",
+        "to level it."
+      ],
+      "small": [
+        "same form, three categories:",
+        "english calls this zero derivation.",
+        "the word never changes direction."
+      ]
+    }
+  ]
+}
