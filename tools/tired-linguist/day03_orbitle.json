@@ -1,0 +1,112 @@
+{
+  "raw": "/home/claude/d3o/raw.mp4",
+  "day": 3,
+  "label": "day 3 · orbitle",
+  "layout": "scaled",
+  "sfx": 0.3,
+  "card": {
+    "name": "orbitle",
+    "sub": "inside gravity",
+    "aside": [
+      "(I made this one too.)"
+    ],
+    "pill": "spoiler warning · answer at the end"
+  },
+  "pieces": [
+    {
+      "s": 0.0,
+      "e": 25.0,
+      "dur": 4.0,
+      "cap": "guess 1. four blocks,|one hidden six-letter word."
+    },
+    {
+      "s": 25.0,
+      "e": 28.5,
+      "cap": "band: a docked.|n orbits, not 3rd."
+    },
+    {
+      "s": 28.5,
+      "e": 31.5,
+      "cap": "gas: g and s orbit.|sos: s docked."
+    },
+    {
+      "s": 31.5,
+      "e": 67.0,
+      "dur": 2.5,
+      "cap": "guess 2.|s, a, and four to go."
+    },
+    {
+      "s": 67.0,
+      "e": 85.2,
+      "dur": 2.5,
+      "cap": "guess 2.|s, a, and four to go."
+    },
+    {
+      "s": 85.2,
+      "e": 87.5,
+      "cap": "boats: a not 3rd,|s not 5th. t out."
+    },
+    {
+      "s": 87.5,
+      "e": 140.5,
+      "dur": 3.5,
+      "cap": "guess 3.|n and g still orbiting."
+    },
+    {
+      "s": 140.5,
+      "e": 145.0,
+      "cap": "fond: f out.|bog: g not 3rd."
+    },
+    {
+      "s": 145.0,
+      "e": 171.0,
+      "dur": 2.0,
+      "cap": "guess 4. stuck."
+    },
+    {
+      "s": 171.0,
+      "e": 181.0,
+      "dur": 3.0,
+      "cap": "so: the game's own hints.|it offered visa, via, saga."
+    },
+    {
+      "s": 181.0,
+      "e": 212.0,
+      "dur": 3.0,
+      "cap": "took visa.|made it visas."
+    },
+    {
+      "s": 212.0,
+      "e": 218.5,
+      "dur": 4.0,
+      "cap": "visas: v and i orbit.|a not 4th."
+    },
+    {
+      "s": 218.5,
+      "e": 243.0,
+      "dur": 3.5,
+      "cap": "guess 5.|s, a, v, i, n, g. somewhere."
+    },
+    {
+      "s": 243.0,
+      "e": 249.0,
+      "dur": 4.5,
+      "cap": "saving. five guesses.|one star. the hints helped."
+    }
+  ],
+  "notes": [
+    {
+      "dur": 5.0,
+      "big": [
+        "saving: one -ing,",
+        "three jobs."
+      ],
+      "small": [
+        "I'm saving it: a verb.",
+        "saving is hard: a noun, the gerund.",
+        "a saving grace: an adjective.",
+        "same suffix. the syntax decides."
+      ]
+    }
+  ]
+}
