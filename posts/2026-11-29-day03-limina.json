@@ -39,8 +39,8 @@
     "instagram:@thetiredlinguist": {
       "status": "failed",
       "error": "Instagram /17841474082650735/media: API access blocked.",
-      "attempts": 2,
-      "lastTry": "2026-11-28T16:31:20.871Z"
+      "attempts": 3,
+      "lastTry": "2026-11-28T16:46:24.324Z"
     }
   }
 }
