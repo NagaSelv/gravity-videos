@@ -1,0 +1,148 @@
+{
+  "raw": "/home/claude/d3g/raw.mp4",
+  "day": 3,
+  "label": "day 3 · gravity high score challenge",
+  "layout": "scaled",
+  "sfx": 0.3,
+  "card": {
+    "name": "gravity",
+    "sub": "high score challenge",
+    "aside": [
+      "(I made this one too.)"
+    ],
+    "pill": "spoiler warning · score at the end"
+  },
+  "pieces": [
+    {
+      "s": 0.3,
+      "e": 2.2,
+      "cap": "block one: no word possible.|it's becoming a habit."
+    },
+    {
+      "s": 2.2,
+      "e": 4.4,
+      "dur": 1.2,
+      "cap": "block two. best: 30."
+    },
+    {
+      "s": 4.4,
+      "e": 6.8,
+      "cap": "coy. 30.|best possible."
+    },
+    {
+      "s": 6.8,
+      "e": 13.8,
+      "dur": 2.0,
+      "cap": "block three. best: 360."
+    },
+    {
+      "s": 13.8,
+      "e": 16.0,
+      "cap": "tic, pit. 120.|best was 360. missed by 240."
+    },
+    {
+      "s": 16.0,
+      "e": 20.2,
+      "dur": 1.2,
+      "cap": "block four. best: 360."
+    },
+    {
+      "s": 20.2,
+      "e": 22.0,
+      "cap": "land, and. 180.|best was 360. half."
+    },
+    {
+      "s": 22.0,
+      "e": 24.0,
+      "cap": "streak bonus. +300.|I'll take it."
+    },
+    {
+      "s": 24.0,
+      "e": 31.5,
+      "dur": 1.5,
+      "cap": "block five: no word possible.|a breather."
+    },
+    {
+      "s": 31.5,
+      "e": 48.0,
+      "dur": 2.5,
+      "cap": "block six. best: 90."
+    },
+    {
+      "s": 48.0,
+      "e": 49.0,
+      "cap": "hey. 30.|best was 90. missed by 60."
+    },
+    {
+      "s": 49.0,
+      "e": 78.0,
+      "dur": 3.0,
+      "cap": "block seven. best: 30.|thirty seconds of turning it."
+    },
+    {
+      "s": 78.0,
+      "e": 80.0,
+      "cap": "dropped it. nothing.|missed the only 30 going."
+    },
+    {
+      "s": 80.0,
+      "e": 84.8,
+      "dur": 1.0,
+      "cap": "block eight."
+    },
+    {
+      "s": 84.8,
+      "e": 87.0,
+      "cap": "mine. 180.|best possible."
+    },
+    {
+      "s": 87.0,
+      "e": 113.5,
+      "dur": 2.5,
+      "cap": "block nine. best: 120."
+    },
+    {
+      "s": 113.5,
+      "e": 117.0,
+      "cap": "wax, tar. 120.|best possible again."
+    },
+    {
+      "s": 117.0,
+      "e": 132.3,
+      "dur": 2.0,
+      "cap": "last block. best: 360."
+    },
+    {
+      "s": 132.3,
+      "e": 134.5,
+      "cap": "eyes, eye, yes. 360.|best possible. combo x3."
+    },
+    {
+      "s": 134.5,
+      "e": 137.0,
+      "cap": "streak bonus. +300.|again."
+    },
+    {
+      "s": 137.0,
+      "e": 143.5,
+      "dur": 3.0,
+      "cap": "1,620. try 1 of 3.|another day at the office."
+    }
+  ],
+  "notes": [
+    {
+      "dur": 4.5,
+      "big": [
+        "eyes: in middle english",
+        "the plural was often",
+        "eyen, like oxen",
+        "and children."
+      ],
+      "small": [
+        "old english ēage, plural ēagan.",
+        "the -s plural won out.",
+        "oxen and children held on."
+      ]
+    }
+  ]
+}
