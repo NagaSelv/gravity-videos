@@ -1,0 +1,113 @@
+{
+  "raw": "/home/claude/d3w/raw.mp4",
+  "day": 3,
+  "label": "day 3 · wordle",
+  "layout": "crop",
+  "sfx": 0,
+  "card": {
+    "name": "wordle",
+    "sub": "#1988",
+    "aside": [],
+    "pill": "spoiler warning · answer at the end"
+  },
+  "pieces": [
+    {
+      "s": 0.0,
+      "e": 4.4,
+      "dur": 2.0,
+      "cap": "opener: tweak.|new one."
+    },
+    {
+      "s": 4.4,
+      "e": 7.0,
+      "cap": "tweak: just a w.|not in 2nd."
+    },
+    {
+      "s": 7.0,
+      "e": 32.5,
+      "dur": 2.0,
+      "cap": "tweak: just a w.|not in 2nd."
+    },
+    {
+      "s": 32.5,
+      "e": 37.0,
+      "cap": "dwell: w in 2nd again.|learning nothing."
+    },
+    {
+      "s": 37.0,
+      "e": 44.0,
+      "dur": 1.5,
+      "cap": "dwell: w in 2nd again.|learning nothing."
+    },
+    {
+      "s": 44.0,
+      "e": 48.5,
+      "cap": "power: o is 2nd.|w is not 3rd."
+    },
+    {
+      "s": 48.5,
+      "e": 84.0,
+      "dur": 2.0,
+      "cap": "power: o is 2nd.|w is not 3rd."
+    },
+    {
+      "s": 84.0,
+      "e": 88.5,
+      "cap": "fowls: w still not 3rd.|l and s out."
+    },
+    {
+      "s": 88.5,
+      "e": 120.3,
+      "dur": 2.0,
+      "cap": "bowls? deleted.|bad guess, caught in time."
+    },
+    {
+      "s": 120.3,
+      "e": 125.0,
+      "cap": "coven: just the o.|c, v, e, n out."
+    },
+    {
+      "s": 125.0,
+      "e": 241.5,
+      "dur": 4.0,
+      "cap": "one guess left.|mo... bow... bouw..."
+    },
+    {
+      "s": 241.5,
+      "e": 246.0,
+      "cap": "wough: not in word list.|fair."
+    },
+    {
+      "s": 246.0,
+      "e": 271.3,
+      "dur": 2.0,
+      "cap": "wombs? womb-y?"
+    },
+    {
+      "s": 271.3,
+      "e": 275.0,
+      "cap": "womby. w, o, y.|m and b out."
+    },
+    {
+      "s": 275.0,
+      "e": 280.5,
+      "dur": 4.0,
+      "cap": "it was woozy.|a bit of a doozy."
+    }
+  ],
+  "notes": [
+    {
+      "dur": 5.0,
+      "big": [
+        "after coven, wordle",
+        "allowed exactly two",
+        "words: woozy and womby."
+      ],
+      "small": [
+        "I picked the one nobody says.",
+        "over a third of wordle's words repeat a letter.",
+        "we still forget to try the double o."
+      ]
+    }
+  ]
+}

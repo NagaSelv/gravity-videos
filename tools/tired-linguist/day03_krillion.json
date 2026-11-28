@@ -1,0 +1,175 @@
+{
+  "raw": "/home/claude/d3k/raw.mp4",
+  "day": 3,
+  "label": "day 3 · krillion",
+  "layout": "crop",
+  "raw_y": 255,
+  "sfx": 0,
+  "card": {
+    "name": "krillion",
+    "sub": "dive #136",
+    "aside": [],
+    "pill": "spoiler warning · answers at the end"
+  },
+  "pieces": [
+    {
+      "s": 2.0,
+      "e": 3.8,
+      "dur": 1.5,
+      "cap": "a green fruit|or vegetable."
+    },
+    {
+      "s": 3.8,
+      "e": 16.5,
+      "dur": 1.6,
+      "cap": "a green fruit|or vegetable."
+    },
+    {
+      "s": 16.5,
+      "e": 20.5,
+      "dur": 1.8,
+      "cap": "zucchini. schooler.|after three spellings."
+    },
+    {
+      "s": 21.5,
+      "e": 23.3,
+      "dur": 1.5,
+      "cap": "a city in latin america|or the caribbean."
+    },
+    {
+      "s": 23.3,
+      "e": 31.5,
+      "dur": 1.4,
+      "cap": "a city in latin america|or the caribbean."
+    },
+    {
+      "s": 31.5,
+      "e": 36.0,
+      "dur": 1.8,
+      "cap": "lima. schooler."
+    },
+    {
+      "s": 36.5,
+      "e": 38.3,
+      "dur": 1.5,
+      "cap": "a musician who has died,|1m+ monthly listeners."
+    },
+    {
+      "s": 38.3,
+      "e": 43.5,
+      "dur": 1.4,
+      "cap": "a musician who has died,|1m+ monthly listeners."
+    },
+    {
+      "s": 43.5,
+      "e": 48.0,
+      "dur": 1.8,
+      "cap": "johnny cash. schooler."
+    },
+    {
+      "s": 48.5,
+      "e": 50.3,
+      "dur": 1.5,
+      "cap": "a player who won|a league title."
+    },
+    {
+      "s": 50.3,
+      "e": 67.0,
+      "dur": 1.8,
+      "cap": "a player who won|a league title."
+    },
+    {
+      "s": 67.0,
+      "e": 72.0,
+      "dur": 1.8,
+      "cap": "cesc fàbregas. schooler.|four in a row. solid."
+    },
+    {
+      "s": 72.5,
+      "e": 74.3,
+      "dur": 1.5,
+      "cap": "a first-person|shooter game."
+    },
+    {
+      "s": 74.3,
+      "e": 84.0,
+      "dur": 1.6,
+      "cap": "a first-person|shooter game."
+    },
+    {
+      "s": 84.0,
+      "e": 89.0,
+      "dur": 1.8,
+      "cap": "crysis. rare.|genuinely uncommon. nice pull."
+    },
+    {
+      "s": 89.5,
+      "e": 91.3,
+      "dur": 1.5,
+      "cap": "a protagonist from a book|that sold 500,000+ copies."
+    },
+    {
+      "s": 91.3,
+      "e": 109.0,
+      "dur": 2.6,
+      "cap": "the clock runs.|my mind does not."
+    },
+    {
+      "s": 109.0,
+      "e": 113.5,
+      "dur": 1.4,
+      "cap": "percy jackson.|with ten seconds left."
+    },
+    {
+      "s": 113.5,
+      "e": 118.0,
+      "dur": 1.8,
+      "cap": "percy jackson. schooler."
+    },
+    {
+      "s": 119.0,
+      "e": 120.8,
+      "dur": 1.5,
+      "cap": "a term from|astrology."
+    },
+    {
+      "s": 120.8,
+      "e": 128.5,
+      "dur": 1.4,
+      "cap": "a term from|astrology."
+    },
+    {
+      "s": 128.5,
+      "e": 133.0,
+      "dur": 1.8,
+      "cap": "leo. plankton.|the answer everyone blurts out."
+    },
+    {
+      "s": 134.0,
+      "e": 138.0,
+      "dur": 3.0,
+      "cap": "220. better than 16%|of today's players."
+    },
+    {
+      "s": 138.0,
+      "e": 142.0,
+      "dur": 2.5,
+      "cap": "yesterday: 310 and 63%.|the clock won today."
+    }
+  ],
+  "notes": [
+    {
+      "dur": 5.0,
+      "big": [
+        "why a timer",
+        "makes you freeze."
+      ],
+      "small": [
+        "under pressure, the most familiar answer",
+        "arrives first and crowds out the rarer ones.",
+        "psycholinguists call it blocking.",
+        "great for leo. bad for krillion."
+      ]
+    }
+  ]
+}
